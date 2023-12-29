@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Table Operations</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: right;
+    }
+
+    main {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      width: 80%;
+      scroll-snap-type: y mandatory;
+      overflow-y: auto;
+      height: 80vh;
+      text-align: right;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      table-layout: fixed;
+      scroll-snap-type: y mandatory;
+      scroll-padding: 20px;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: center;
+      overflow: hidden;
+      scroll-snap-type: y mandatory;
+      scroll-padding: 20px;
+      text-overflow: ellipsis;
+      padding: 15px;
+      white-space: normal; /* Allow text to wrap within cells */
+      
+    }
+
+    th {
+      background-color: #3498db;
+      color: #fff;
+      position: sticky;
+      top: 0;
+    }
+
+    td {
+      border-bottom: 1px solid #ddd;
+    }
+
+    tbody {
+      max-height: 300px;
+      overflow-y: auto;
+      display: block;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 12px;
+      margin: 5px;
+    }
+
+    h3
+    {
+      padding: 10px 20px;
+      font-size: 16px;
+      text-align: left;
+      text-align: top;
+      background-color: #ffffff;
+      color: #171313;
+      border: none;
+      cursor: pointer;
+      border-radius: 12px;
+      margin: 5px;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 14px;
+      margin-bottom: 10px;
+      margin-top: 20px;
+      margin-left: 20px;
+      margin-right: 20px;
+      width: calc(280);
+      box-sizing: border-box;
+      text-align: right;
+    }
+
+    #dataTable tr {
+      transition: background-color 0.3s ease; /* Smooth transition for background color */
+    }
+
+    #dataTable tr:hover {
+      background-color: #f5f5f5; /* Highlight on hover */
+    }
+
+    /* Password prompt style */
+    #passwordPrompt {
+      background: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+    }
+
+    #passwordPromptContainer {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    #passwordPromptContainer label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: #333;
+    }
+
+    #passwordPromptContainer input {
+      width: 70%;
+      padding: 10px;
+      font-size: 14px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    #passwordPromptContainer button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    /* Search box style */
+    #tableSearchInput {
+      padding: 10px;
+      font-size: 14px;
+      margin-bottom: 10px;
+      width: calc(280px);
+      box-sizing: border-box;
+      color: #000000;
+      transition: background-color 0.3s ease;
+    }
+
+    p {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    /* Width Panel styles */
+    #widthPanel {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main>
+
+    <!-- Password prompt -->
+    <div id="passwordPrompt">
+      <div id="passwordPromptContainer">
+        <label for="password">Enter Password:</label>
+        <input type="password" id="password" />
+        <button onclick="checkPassword()">Submit</button>
+      </div>
+    </div>
+
+    <h3>Eng.Aland bakr (0776 697 70 47)</h3>
+    <input type="none" id="idInput" placeholder="ID">
+    <input type="text" id="nameInput" placeholder="ناو">
+    <input type="text" id="typeInput" placeholder="جۆری کاڵا">
+    <input type="text" id="floatNumberInput" placeholder="نرخ">
+    <input type="text" id="mobileNumberInput" placeholder="ژمارەی مۆبایل">
+    <input type="text" id="dateInput" placeholder="تاریخ">
+    <br>
+
+    <button onclick="updateData()">نوێکردنەوە</button>
+    <button onclick="addData()">زیاددکردن</button>
+    <button onclick="deleteData()">سڕینەوە</button>
+    <br>
+
+    <input type="text" id="tableSearchInput" placeholder="گەڕان ئەنجام بدە">
+    <br>
+    <button onclick="searchInTable()">گەڕان</button>
+
+    <div id="widthPanel">
+      <p> <span id="typeContent">-</span><b>-:جۆری کاڵا </b></p>
+    </div>
+
+<p id="rowSizeDisplay">Rows: 0</p>
+
+<!-- Width Panel to show content of "جۆری کاڵا" cell -->
+
+
+
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>ناو</th>
+          <th>نرخ</th>
+          <th>جۆری کاڵا</th>
+          <th>ژمارەی مۆبایل</th>
+          
+          <th>تاریخ</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
+
+  <script>
+    var selectedRow = null;
+
+    function onCellClick(row, cell) {
+      selectedRow = row;
+      document.getElementById('idInput').value = row.cells[0].innerText;
+      document.getElementById('nameInput').value = row.cells[1].innerText;
+      document.getElementById('floatNumberInput').value = row.cells[2].innerText;
+      document.getElementById('typeInput').value = row.cells[3].innerText;
+      document.getElementById('mobileNumberInput').value = row.cells[4].innerText;
+    
+      document.getElementById('dateInput').value = row.cells[5].innerText;
+
+
+      document.getElementById('typeContent').innerText = row.cells[3].innerText;
+    }
+
+    function updateData() {
+      if (selectedRow) {
+        selectedRow.cells[1].innerText = document.getElementById('nameInput').value;
+        selectedRow.cells[2].innerText = document.getElementById('floatNumberInput').value;
+        selectedRow.cells[3].innerText = document.getElementById('typeInput').value;
+        selectedRow.cells[4].innerText = document.getElementById('mobileNumberInput').value;
+ 
+        selectedRow.cells[5].innerText = document.getElementById('dateInput').value;
+        updateLocalStorage();
+      }
+    }
+
+    function addData() {
+      var table = document.getElementById('dataTable');
+      var newRow = table.insertRow(table.rows.length);
+      newRow.onclick = function () {
+        onCellClick(newRow, this);
+      };
+
+      var cell1 = newRow.insertCell(0);
+      var cell2 = newRow.insertCell(1);
+      var cell3 = newRow.insertCell(2);
+      var cell4 = newRow.insertCell(3);
+      var cell5 = newRow.insertCell(4);
+     
+      var cell6 = newRow.insertCell(5);
+
+      cell1.innerHTML = table.rows.length - 1;
+      cell2.innerHTML = document.getElementById('nameInput').value;
+      cell3.innerHTML = document.getElementById('floatNumberInput').value;
+      cell4.innerHTML = document.getElementById('typeInput').value;
+      cell5.innerHTML = document.getElementById('mobileNumberInput').value;
+   
+      cell6.innerHTML = document.getElementById('dateInput').value;
+
+      updateLocalStorage();
+    }
+
+    function deleteData() {
+      if (selectedRow) {
+        document.getElementById('dataTable').deleteRow(selectedRow.rowIndex);
+        selectedRow = null;
+        clearInputFields();
+        updateLocalStorage();
+      }
+    }
+
+    function clearInputFields() {
+      document.getElementById('idInput').value = '';
+      document.getElementById('nameInput').value = '';
+      document.getElementById('floatNumberInput').value = '';
+      document.getElementById('typeInput').value = '';
+      document.getElementById('mobileNumberInput').value = '';
+ 
+      document.getElementById('dateInput').value = '';
+    }
+
+    function updateLocalStorage() {
+      var data = [];
+      var tableRows = document.getElementById('dataTable').rows;
+
+      for (var i = 1; i < tableRows.length; i++) {
+        var rowData = {
+          id: tableRows[i].cells[0].innerText,
+          name: tableRows[i].cells[1].innerText,
+          floatNumber: tableRows[i].cells[2].innerText,
+          type: tableRows[i].cells[3].innerText,
+          mobileNumber: tableRows[i].cells[4].innerText,
+
+          date: tableRows[i].cells[5].innerText,
+        };
+        data.push(rowData);
+      }
+
+      localStorage.setItem('tableData', JSON.stringify(data));
+      updateRowSizeDisplay();
+    }
+
+    function updateRowSizeDisplay() {
+
+      document.getElementById('rowSizeDisplay').innerText = document.getElementById('dataTable').rows.length - 1;
+    }
+
+    function loadDataFromLocalStorage() {
+      var storedData = localStorage.getItem('tableData');
+      if (storedData) {
+        var data = JSON.parse(storedData);
+        var table = document.getElementById('dataTable');
+
+        data.forEach(function (rowData) {
+          var newRow = table.insertRow(table.rows.length);
+
+          var cell1 = newRow.insertCell(0);
+          var cell2 = newRow.insertCell(1);
+          var cell3 = newRow.insertCell(2);
+          var cell4 = newRow.insertCell(3);
+          var cell5 = newRow.insertCell(4);
+         
+          var cell6 = newRow.insertCell(5);
+
+          cell1.innerHTML = rowData.id;
+          cell2.innerHTML = rowData.name;
+          cell3.innerHTML = rowData.floatNumber;
+          cell4.innerHTML = rowData.type;
+          cell5.innerHTML = rowData.mobileNumber;
+         
+          cell6.innerHTML = rowData.date;
+
+          newRow.onclick = function () {
+            onCellClick(newRow, this);
+          };
+        });
+
+        updateRowSizeDisplay();
+      }
+    }
+
+    function searchInTable() {
+      var input, filter, table, tr, td, i, j, txtValue;
+      input = document.getElementById("tableSearchInput");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("dataTable");
+      tr = table.getElementsByTagName("tr");
+
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td");
+        for (j = 0; j < td.length; j++) {
+          if (td[j]) {
+            txtValue = td[j].innerText || td[j].textContent;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+              break; 
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
+        }
+      }
+    }
+
+    function checkPassword() {
+      var password = document.getElementById('password').value;
+
+      if (password === '!@#$%^&*()') {
+        document.getElementById('passwordPrompt').style.display = 'none';
+
+        loadDataFromLocalStorage();
+      } else {
+        alert('Incorrect password. Please try again.');
+      }
+    }
+  </script>
+
+</body>
+
+</html>
